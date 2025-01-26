@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Product List</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <a href="/" class="back-button">Go Back to Home</a>
+    <h1>Available Products</h1>
+    <div class="products">
+        <div th:each="product : ${products}" class="product">
+            <h2 th:text="${product.title}"></h2>
+            <img th:src="${product.imageUrl}" alt="Product Image" />
+            <p th:text="'Price: ' + ${product.price} + ' PLN'"></p>
+            <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
