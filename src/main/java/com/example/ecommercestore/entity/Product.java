@@ -3,6 +3,9 @@ package com.example.ecommercestore.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class Product {
@@ -16,4 +19,5 @@ public class Product {
     private double pocztaPrice;
     private double kurierPrice;
     private int stockQuantity;
+    private List<Review> reviews = new ArrayList<>();
 }

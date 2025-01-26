@@ -107,3 +107,50 @@
 .back-button:hover {
     background-color: #0056b3;
 }
+
+.reviews {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.reviews ul {
+    list-style: none;
+    padding: 0;
+}
+
+.reviews li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.add-review-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-review-button:hover {
+    background-color: #0056b3;
+}
+
+.stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #ffd700; /* Złoty kolor dla wypełnionych gwiazdek */
+}
+
+.stars .fas {
+    font-size: 1rem; /* Rozmiar wypełnionych gwiazdek */
+}
+
+.stars .far {
+    font-size: 1rem; /* Rozmiar pustych gwiazdek */
+    color: #ddd; /* Kolor pustych gwiazdek */
+}
