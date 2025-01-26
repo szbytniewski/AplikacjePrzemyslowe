@@ -2,18 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Product List</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/buttons.css">
+
 </head>
 <body>
 <div class="container">
-    <a href="/" class="back-button">Go Back to Home</a>
     <h1>Available Products</h1>
     <div class="products">
         <div th:each="product : ${products}" class="product">
             <h2 th:text="${product.title}"></h2>
             <img th:src="${product.imageUrl}" alt="Product Image" />
-            <p th:text="'Price: ' + ${product.price} + ' PLN'"></p>
-            <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
+            <p th:text="'Base Price: $' + ${product.price}"></p>
+            <p>Delivery Options:</p>
+            <ul>
+                <li th:text="'Paczkomat: $' + ${product.paczkomatPrice}"></li>
+                <li th:text="'Poczta: $' + ${product.pocztaPrice}"></li>
+                <li th:text="'Kurier: $' + ${product.kurierPrice}"></li>
+            </ul>
+            <p th:text="'Available Stock: ' + ${product.stockQuantity}"></p>
+            <p th:text="${product.description}"></p>
+            <div class="actions">
+                <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
+                <form th:action="@{'/products/' + ${product.id} + '/add-to-cart'}" method="post">
+                    <button type="submit" class="add-to-cart-button">Add to Cart</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

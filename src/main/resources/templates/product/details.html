@@ -2,18 +2,36 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Product Details</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/product-details.css">
 </head>
 <body>
-<h1 th:text="${product.title}"></h1>
-<img th:src="${product.imageUrl}" alt="Product Image" />
-<p th:text="${product.description}"></p>
-<p th:text="${product.extendedDescription}"></p>
-<p>Price: <span th:text="${product.price}"></span></p>
-<p>Delivery Price: <span th:text="${product.deliveryPrice}"></span></p>
-<p>Stock: <span th:text="${product.stockQuantity}"></span></p>
-<form th:action="@{'/products/' + ${product.id} + '/add-to-cart'}" method="post">
-    <input type="number" name="quantity" min="1" max="${product.stockQuantity}" />
-    <button type="submit">Add to Cart</button>
-</form>
+<div class="container">
+    <a href="/products" class="back-button">Back to Product List</a>
+    <div class="product-details">
+        <h1 th:text="${product.title}"></h1>
+        <img th:src="${product.imageUrl}" alt="Product Image" />
+        <h3>Description</h3>
+        <p class="description" th:text="${product.description}"></p>
+        <h3>Details</h3>
+        <p class="extended-description" th:text="${product.extendedDescription}"></p>
+        <div class="pricing">
+            <h3>Pricing Details</h3>
+            <p>Base Price: <span th:text="'$' + ${product.price}"></span></p>
+            <p>Delivery Options:</p>
+            <ul>
+                <li>Paczkomat: <span th:text="'$' + ${product.paczkomatPrice}"></span></li>
+                <li>Poczta: <span th:text="'$' + ${product.pocztaPrice}"></span></li>
+                <li>Kurier: <span th:text="'$' + ${product.kurierPrice}"></span></li>
+            </ul>
+            <p>Available Stock: <span th:text="${product.stockQuantity}"></span></p>
+        </div>
+        <form th:action="@{'/products/' + ${product.id} + '/add-to-cart'}" method="post" class="cart-form">
+            <label for="quantity">Quantity:</label>
+            <input type="number" name="quantity" id="quantity" min="1" max="${product.stockQuantity}" value="1" />
+            <button type="submit" class="add-to-cart-button">Add to Cart</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

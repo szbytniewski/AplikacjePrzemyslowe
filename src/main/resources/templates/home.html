@@ -2,13 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Home</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/buttons.css">
+
 </head>
 <body>
 <div class="container">
     <h1>Welcome to Our E-Commerce Store</h1>
-    <p>Find the best products at amazing prices.</p>
-    <a href="/products" class="button">View Products</a>
+    <p>Check out these amazing products:</p>
+    <div class="featured-products">
+        <div th:each="product : ${products}" class="product">
+            <h2 th:text="${product.title}"></h2>
+            <img th:src="${product.imageUrl}" alt="Product Image" class="product-image" />
+            <p th:text="'Price: $' + ${product.price}"></p>
+            <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
+        </div>
+    </div>
+    <a href="/products" class="button">View All Products</a>
 </div>
 </body>
 </html>

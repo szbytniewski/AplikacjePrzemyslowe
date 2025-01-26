@@ -12,6 +12,8 @@ public class Product {
     private String description;
     private String extendedDescription;
     private double price;
-    private double deliveryPrice;
+    private double paczkomatPrice;
+    private double pocztaPrice;
+    private double kurierPrice;
     private int stockQuantity;
 }
