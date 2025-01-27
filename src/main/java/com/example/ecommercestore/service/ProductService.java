@@ -2,10 +2,14 @@ package com.example.ecommercestore.service;
 
 import com.example.ecommercestore.entity.Product;
 import com.example.ecommercestore.entity.Review;
+import com.example.ecommercestore.exception.ProductNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
 public class ProductService {
@@ -22,11 +26,31 @@ public class ProductService {
         return products;
     }
 
+    public List<Product> filterAndSortProducts(String category, String sortBy, Double minPrice, Double maxPrice) {
+        return products.stream()
+                .filter(product -> category == null || product.getTitle().toLowerCase().contains(category.toLowerCase()))
+                .filter(product -> minPrice == null || product.getPrice() >= minPrice)
+                .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
+                .sorted(getComparator(sortBy))
+                .collect(Collectors.toList());
+    }
+
+    private Comparator<Product> getComparator(String sortBy) {
+        if ("priceAsc".equals(sortBy)) {
+            return Comparator.comparing(Product::getPrice);
+        } else if ("priceDesc".equals(sortBy)) {
+            return Comparator.comparing(Product::getPrice).reversed();
+        } else if ("rating".equals(sortBy)) {
+            return Comparator.comparing(this::getAverageRating).reversed();
+        }
+        return Comparator.comparing(Product::getId);
+    }
+
     public Product getProductById(Long id) {
         return products.stream()
                 .filter(product -> product.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
     }
 
     public void addReviewToProduct(Long productId, Review review) {
@@ -34,8 +58,7 @@ public class ProductService {
         product.getReviews().add(review);
     }
 
-    public double getAverageRating(Long productId) {
-        Product product = getProductById(productId);
+    public double getAverageRating(Product product) {
         return product.getReviews().stream()
                 .mapToInt(Review::getRating)
                 .average()

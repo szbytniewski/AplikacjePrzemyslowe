@@ -1,31 +1,43 @@
 package com.example.ecommercestore.controller;
 
 import com.example.ecommercestore.entity.Review;
+import com.example.ecommercestore.entity.Product;
 import com.example.ecommercestore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
+@RequestMapping("/products")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/products")
-    public String home(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
+    @GetMapping
+    public String listProducts(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            Model model) {
+        List<Product> products = productService.filterAndSortProducts(category, sortBy, minPrice, maxPrice);
+        model.addAttribute("products", products);
         return "product/list";
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/{id}")
     public String details(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getProductById(id));
-        model.addAttribute("averageRating", productService.getAverageRating(id));
+        Product product = productService.getProductById(id);
+        model.addAttribute("product", product);
+
+        model.addAttribute("averageRating", productService.getAverageRating(product));
         return "product/details";
     }
-    @PostMapping("/products/{id}/reviews")
+    @PostMapping("/{id}/reviews")
     public String addReview(@PathVariable Long id,
                             @RequestParam String username,
                             @RequestParam String comment,
