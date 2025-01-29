@@ -12,14 +12,17 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class ProductService {
+public class ProductServiceInterface implements com.example.ecommercestore.interfaces.ProductServiceInterface {
 
     private final List<Product> products = new ArrayList<>();
+    private Long nextId = 1L;
 
-    public ProductService() {
+    public ProductServiceInterface() {
         products.add(new Product(1L, "Laptop", "/images/laptop.jpg", "Opis laptopa", "Szczegółowy opis laptopa", 3000.00, 3020.00,3040.00,3060.00, 10, new ArrayList<>()));
         products.add(new Product(2L, "Telefon", "/images/phone.jpg", "Opis telefonu", "Szczegółowy opis telefonu", 2000.00, 2020.00,2040.00,2060.00, 15, new ArrayList<>()));
         products.add(new Product(3L, "Smartwatch", "/images/smartwatch.jpg", "Opis smartwatcha", "Szczegółowy opis smartwatcha", 800.00, 820.00,840.00,860.00, 20, new ArrayList<>()));
+
+        nextId = 4L;
     }
 
     public List<Product> getAllProducts() {
@@ -63,5 +66,23 @@ public class ProductService {
                 .mapToInt(Review::getRating)
                 .average()
                 .orElse(0.0);
+    }
+
+    public void saveProduct(Product product) {
+        if (product.getId() == null) {
+            product.setId(nextId++);
+        }
+        products.add(product);
+    }
+
+    public void deleteProduct(Long id) {
+        products.removeIf(p -> p.getId().equals(id));
+    }
+
+    public void removeReview(Long productId, int reviewIndex) {
+        Product product = getProductById(productId);
+        if (reviewIndex >= 0 && reviewIndex < product.getReviews().size()) {
+            product.getReviews().remove(reviewIndex);
+        }
     }
 }

@@ -4,10 +4,13 @@
     <title>Shopping Cart</title>
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/cart.css">
+    <link rel="stylesheet" href="/css/header.css">
 
 </head>
 <body>
+<div th:replace="~{fragments/header :: navbar}"></div>
 <div class="container">
+
     <a href="/products" class="button">Back to Product List</a>
 
     <h1>Your Cart</h1>

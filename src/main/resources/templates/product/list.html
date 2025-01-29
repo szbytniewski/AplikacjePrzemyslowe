@@ -8,10 +8,12 @@
     <link rel="stylesheet" href="/css/buttons.css">
     <link rel="stylesheet" href="/css/product-list.css">
     <link rel="stylesheet" href="/css/cart-summary.css">
+    <link rel="stylesheet" href="/css/header.css">
 
 
 </head>
 <body>
+<div th:replace="~{fragments/header :: navbar}"></div>
 <div class="cart-summary">
     <h3>Shopping Cart</h3>
     <p>Total Products: <span th:text="${cart.items.size()}"></span></p>
@@ -19,6 +21,7 @@
     <a href="/cart" class="button">View Cart</a>
 </div>
 <div class="container">
+
     <h1>Available Products</h1>
 
     <form action="/products" method="get" class="filter-form">

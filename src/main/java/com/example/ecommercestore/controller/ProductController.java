@@ -3,7 +3,7 @@ package com.example.ecommercestore.controller;
 import com.example.ecommercestore.entity.Review;
 import com.example.ecommercestore.entity.Product;
 import com.example.ecommercestore.service.CartService;
-import com.example.ecommercestore.service.ProductService;
+import com.example.ecommercestore.service.ProductServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +19,7 @@ public class ProductController {
     private CartService cartService;
 
     @Autowired
-    private ProductService productService;
+    private ProductServiceInterface productService;
 
     @GetMapping
     public String listProducts(
