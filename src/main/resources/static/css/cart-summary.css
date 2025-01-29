@@ -1,0 +1,32 @@
+.cart-summary {
+    position: fixed;
+    top: 100px;
+    left: 20px;
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 1000;
+}
+
+.cart-summary h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+}
+
+.cart-summary p {
+    font-size: 1rem;
+    margin: 5px 0;
+    color: #555;
+}
+
+.cart-summary .button {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 1rem;
+}

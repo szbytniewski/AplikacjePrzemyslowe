@@ -7,10 +7,21 @@
     <link rel="stylesheet" href="/css/product.css">
     <link rel="stylesheet" href="/css/buttons.css">
     <link rel="stylesheet" href="/css/product-list.css">
+    <link rel="stylesheet" href="/css/cart-summary.css">
+    <link rel="stylesheet" href="/css/header.css">
+
 
 </head>
 <body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+<div class="cart-summary">
+    <h3>Shopping Cart</h3>
+    <p>Total Products: <span th:text="${cart.items.size()}"></span></p>
+    <p>Total Price: <span th:text="'$' + ${cart.totalCost}"></span></p>
+    <a href="/cart" class="button">View Cart</a>
+</div>
 <div class="container">
+
     <h1>Available Products</h1>
 
     <form action="/products" method="get" class="filter-form">
@@ -59,10 +70,12 @@
             <p th:text="${product.description}"></p>
             <div class="actions">
                 <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
-                <form th:action="@{'/products/' + ${product.id} + '/add-to-cart'}" method="post">
+                <form th:action="@{'/cart/add/' + ${product.id}}" method="post">
+                    <input type="hidden" name="quantity" value="1">
                     <button type="submit" class="add-to-cart-button">Add to Cart</button>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
