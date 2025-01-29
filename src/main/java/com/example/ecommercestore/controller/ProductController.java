@@ -2,6 +2,7 @@ package com.example.ecommercestore.controller;
 
 import com.example.ecommercestore.entity.Review;
 import com.example.ecommercestore.entity.Product;
+import com.example.ecommercestore.service.CartService;
 import com.example.ecommercestore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,9 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
+    private CartService cartService;
+
+    @Autowired
     private ProductService productService;
 
     @GetMapping
@@ -26,6 +30,7 @@ public class ProductController {
             Model model) {
         List<Product> products = productService.filterAndSortProducts(category, sortBy, minPrice, maxPrice);
         model.addAttribute("products", products);
+        model.addAttribute("cart", cartService.getCart());
         return "product/list";
     }
 
@@ -35,6 +40,8 @@ public class ProductController {
         model.addAttribute("product", product);
 
         model.addAttribute("averageRating", productService.getAverageRating(product));
+        model.addAttribute("cart", cartService.getCart());
+
         return "product/details";
     }
     @PostMapping("/{id}/reviews")

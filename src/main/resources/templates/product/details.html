@@ -5,8 +5,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/product-details.css">
+    <link rel="stylesheet" href="/css/cart-summary.css">
+
 </head>
 <body>
+<div class="cart-summary">
+    <h3>Shopping Cart</h3>
+    <p>Total Products: <span th:text="${cart.items.size()}"></span></p>
+    <p>Total Price: <span th:text="'$' + ${cart.totalCost}"></span></p>
+    <a href="/cart" class="button">View Cart</a>
+</div>
+
 <div class="container">
     <a href="/products" class="back-button">Back to Product List</a>
 
@@ -31,9 +40,9 @@
             <p>Available Stock: <span th:text="${product.stockQuantity}"></span></p>
         </div>
 
-        <form th:action="@{'/products/' + ${product.id} + '/add-to-cart'}" method="post" class="cart-form">
+        <form th:action="@{'/cart/add/' + ${product.id}}" method="post" class="cart-form">
             <label for="quantity">Quantity:</label>
-            <input type="number" name="quantity" id="quantity" min="1" max="${product.stockQuantity}" value="1" />
+            <input type="number" name="quantity" id="quantity" min="1" max="${product.stockQuantity}" value="1" required>
             <button type="submit" class="add-to-cart-button">Add to Cart</button>
         </form>
 

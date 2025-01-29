@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/checkout.css">
+</head>
+<body>
+<div class="container">
+    <h1>Thank You for Your Order!</h1>
+    <p><strong>Name:</strong> <span th:text="${fullName}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+    <p><strong>Delivery Address:</strong> <span th:text="${address}"></span></p>
+    <p><strong>Delivery Method:</strong> <span th:text="${deliveryMethod}"></span></p>
+    <p><strong>Total Cost:</strong> $<span th:text="${totalCost}"></span></p>
+
+    <a href="/products" class="button">Back to Product List</a>
+</div>
+</body>
+</html>
