@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/header.css">
 </head>
 <body>
 <nav class="navbar" th:fragment="navbar">
-  <a href="/products" class="nav-button">Home</a>
+  <a href="/" class="nav-button">Home</a>
+  <a href="/products" class="nav-button">Products</a>
   <a href="/cart" class="nav-button">Cart</a>
   <a href="/admin" class="nav-button admin-button">Admin Panel</a>
+
+  <div id="user-section">
+    <span id="user-email" style="display: none;" ></span>
+    <a href="/oauth2/authorization/google" id="login-button">
+      <button>Login with Google</button>
+    </a>
+    <form th:action="@{/logout}" method="post" id="logout-button" style="display: none;">
+      <button type="submit" class="btn-logout">Logout</button>
+    </form>
+
+  </div>
 </nav>
+
+
 </body>
 </html>

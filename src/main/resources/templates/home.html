@@ -5,12 +5,19 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/home.css">
     <link rel="stylesheet" href="/css/buttons.css">
-
+    <link rel="stylesheet" href="/css/header.css">
+    <script src="/js/auth.js"></script>
 </head>
+
 <body>
+
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+
 <div class="container">
-    <h1>Welcome to Our E-Commerce Store</h1>
+    <h1>Welcome to Sebastian's E-Commerce Store</h1>
     <p>Check out these amazing products:</p>
+
     <div class="featured-products">
         <div th:each="product : ${products}" class="product">
             <h2 th:text="${product.title}"></h2>
@@ -19,6 +26,7 @@
             <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
         </div>
     </div>
+
     <a href="/products" class="button">View All Products</a>
 </div>
 </body>
