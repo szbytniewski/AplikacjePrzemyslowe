@@ -4,6 +4,7 @@ import com.example.ecommercestore.entity.Cart;
 import com.example.ecommercestore.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +15,14 @@ public class CheckoutController {
     @Autowired
     private CartService cartService;
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping
     public String checkoutForm(Model model) {
         model.addAttribute("cart", cartService.getCart());
         return "checkout/form";
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping
     public String processCheckout(
             @RequestParam String fullName,

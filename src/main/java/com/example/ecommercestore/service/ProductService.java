@@ -3,6 +3,9 @@ package com.example.ecommercestore.service;
 import com.example.ecommercestore.entity.Product;
 import com.example.ecommercestore.entity.Review;
 import com.example.ecommercestore.exception.ProductNotFoundException;
+import com.example.ecommercestore.repository.ProductRepository;
+import com.example.ecommercestore.repository.ReviewRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,25 +15,23 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class ProductServiceInterface implements com.example.ecommercestore.interfaces.ProductServiceInterface {
+public class ProductService implements com.example.ecommercestore.interfaces.ProductServiceInterface {
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     private final List<Product> products = new ArrayList<>();
-    private Long nextId = 1L;
-
-    public ProductServiceInterface() {
-        products.add(new Product(1L, "Laptop", "/images/laptop.jpg", "Opis laptopa", "Szczegółowy opis laptopa", 3000.00, 3020.00,3040.00,3060.00, 10, new ArrayList<>()));
-        products.add(new Product(2L, "Telefon", "/images/phone.jpg", "Opis telefonu", "Szczegółowy opis telefonu", 2000.00, 2020.00,2040.00,2060.00, 15, new ArrayList<>()));
-        products.add(new Product(3L, "Smartwatch", "/images/smartwatch.jpg", "Opis smartwatcha", "Szczegółowy opis smartwatcha", 800.00, 820.00,840.00,860.00, 20, new ArrayList<>()));
-
-        nextId = 4L;
-    }
+    private Long nextId = 2L;
 
     public List<Product> getAllProducts() {
-        return products;
+        return productRepository.findAll();
     }
 
     public List<Product> filterAndSortProducts(String category, String sortBy, Double minPrice, Double maxPrice) {
-        return products.stream()
+        return productRepository.findAll().stream()
                 .filter(product -> category == null || product.getTitle().toLowerCase().contains(category.toLowerCase()))
                 .filter(product -> minPrice == null || product.getPrice() >= minPrice)
                 .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
@@ -50,15 +51,16 @@ public class ProductServiceInterface implements com.example.ecommercestore.inter
     }
 
     public Product getProductById(Long id) {
-        return products.stream()
-                .filter(product -> product.getId().equals(id))
-                .findFirst()
+        return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
     }
 
     public void addReviewToProduct(Long productId, Review review) {
-        Product product = getProductById(productId);
-        product.getReviews().add(review);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        review.setProduct(product);
+        reviewRepository.save(review);
     }
 
     public double getAverageRating(Product product) {

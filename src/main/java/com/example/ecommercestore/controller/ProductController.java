@@ -3,7 +3,7 @@ package com.example.ecommercestore.controller;
 import com.example.ecommercestore.entity.Review;
 import com.example.ecommercestore.entity.Product;
 import com.example.ecommercestore.service.CartService;
-import com.example.ecommercestore.service.ProductServiceInterface;
+import com.example.ecommercestore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +19,7 @@ public class ProductController {
     private CartService cartService;
 
     @Autowired
-    private ProductServiceInterface productService;
+    private ProductService productService;
 
     @GetMapping
     public String listProducts(
@@ -49,7 +49,10 @@ public class ProductController {
                             @RequestParam String username,
                             @RequestParam String comment,
                             @RequestParam int rating) {
-        Review review = new Review(username, comment, rating);
+        Review review = new Review();
+        review.setUsername(username);
+        review.setComment(comment);
+        review.setRating(rating);
         productService.addReviewToProduct(id, review);
         return "redirect:/products/" + id;
     }

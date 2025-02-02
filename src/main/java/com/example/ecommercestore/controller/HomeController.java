@@ -1,7 +1,7 @@
 package com.example.ecommercestore.controller;
 
 import com.example.ecommercestore.entity.Product;
-import com.example.ecommercestore.service.ProductServiceInterface;
+import com.example.ecommercestore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,12 +13,16 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
-    private ProductServiceInterface productService;
+    private ProductService productService;
 
     @GetMapping("/")
     public String home(Model model) {
-        List<Product> products = productService.getAllProducts().subList(0, 2);
-        model.addAttribute("products", products);
+        List<Product> allProducts = productService.getAllProducts();
+        List<Product> featuredProducts = allProducts.size() > 2
+                ? allProducts.subList(0, 2)
+                : allProducts;
+
+        model.addAttribute("products", featuredProducts);
         return "home";
     }
 }

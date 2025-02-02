@@ -3,26 +3,40 @@ package com.example.ecommercestore.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
+import java.util.Set;
+
 @Configuration
 public class SecurityConfig {
+
+    private static final String ADMIN_EMAIL = "ex@gmail.com";
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/home", "/public/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/checkout").permitAll()
+                        .requestMatchers("/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .csrf(csrf -> csrf.disable())
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/google")
+                        .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
                         .successHandler(authenticationSuccessHandler())
                 )
                 .logout(logout -> logout
@@ -34,6 +48,23 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public OidcUserService oidcUserService() {
+        return new OidcUserService() {
+            @Override
+            public OidcUser loadUser(OidcUserRequest userRequest) {
+                OidcUser oidcUser = super.loadUser(userRequest);
+                String email = oidcUser.getAttribute("email");
+
+                Set<SimpleGrantedAuthority> authorities = email.equals(ADMIN_EMAIL) ?
+                        Set.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
+                        Set.of(new SimpleGrantedAuthority("ROLE_USER"));
+
+                return new DefaultOidcUser(authorities, oidcUser.getIdToken(), oidcUser.getUserInfo());
+            }
+        };
     }
 
     @Bean
