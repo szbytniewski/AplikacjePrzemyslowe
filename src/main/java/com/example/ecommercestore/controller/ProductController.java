@@ -31,6 +31,7 @@ public class ProductController {
         List<Product> products = productService.filterAndSortProducts(category, sortBy, minPrice, maxPrice);
         model.addAttribute("products", products);
         model.addAttribute("cart", cartService.getCart());
+        model.addAttribute("totalCost", cartService.getTotalCost());
         return "product/list";
     }
 
@@ -41,6 +42,7 @@ public class ProductController {
 
         model.addAttribute("averageRating", productService.getAverageRating(product));
         model.addAttribute("cart", cartService.getCart());
+        model.addAttribute("totalCost", cartService.getTotalCost());
 
         return "product/details";
     }

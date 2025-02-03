@@ -10,6 +10,8 @@
     <h1>Checkout</h1>
 
     <form action="/checkout" method="post">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+
         <label for="fullName">Full Name:</label>
         <input type="text" id="fullName" name="fullName" required>
 
@@ -27,6 +29,7 @@
 
         <button type="submit">Confirm Order</button>
     </form>
+
 
     <p class="error-message" th:if="${error}" th:text="${error}"></p>
 

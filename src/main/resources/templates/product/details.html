@@ -4,6 +4,7 @@
     <title>Product Details</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/buttons.css">
     <link rel="stylesheet" href="/css/product-details.css">
     <link rel="stylesheet" href="/css/cart-summary.css">
     <script src="/js/auth.js"></script>
@@ -16,7 +17,7 @@
 <div class="cart-summary">
     <h3>Shopping Cart</h3>
     <p>Total Products: <span th:text="${cart.items.size()}"></span></p>
-    <p>Total Price: <span th:text="'$' + ${cart.totalCost}"></span></p>
+    <p>Total Price: <span th:text="'$' + ${totalCost}"></span></p>
     <a href="/cart" class="button">View Cart</a>
 </div>
 
@@ -44,10 +45,30 @@
             <p>Available Stock: <span th:text="${product.stockQuantity}"></span></p>
         </div>
 
-        <form th:action="@{'/cart/add/' + ${product.id}}" method="post" class="cart-form">
+        <h3>Select Pricing Option</h3>
+
+        <form th:action="@{'/cart/add/' + ${product.id}}" method="post">
+            <input type="hidden" name="productId" th:value="${product.id}" />
+            <label>
+                <input type="radio" name="pricingOption" value="basic" required /> Basic Price: <span th:text="${product.price}"></span>
+            </label>
+            <br>
+            <label>
+                <input type="radio" name="pricingOption" value="delivery1" required /> Price with Standard Delivery: <span th:text="${product.price + product.paczkomatPrice}"></span>
+            </label>
+            <br>
+            <label>
+                <input type="radio" name="pricingOption" value="delivery2" required /> Price with Express Delivery: <span th:text="${product.price + product.pocztaPrice}"></span>
+            </label>
+            <br>
+            <label>
+                <input type="radio" name="pricingOption" value="delivery3" required /> Price with Premium Delivery: <span th:text="${product.price + product.kurierPrice}"></span>
+            </label>
+            <br>
             <label for="quantity">Quantity:</label>
-            <input type="number" name="quantity" id="quantity" min="1" max="${product.stockQuantity}" value="1" required>
-            <button type="submit" class="add-to-cart-button">Add to Cart</button>
+            <input type="number" name="quantity" id="quantity" min="1" value="1" required />
+            <br>
+            <button type="submit">Add to Cart</button>
         </form>
 
         <div class="reviews">

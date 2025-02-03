@@ -17,7 +17,7 @@ public class Order {
     private Long id;
     private String customerName;
     private String customerEmail;
-    @OneToMany
-    private List<Product> products;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderProduct> orderProducts;
     private double totalPrice;
 }

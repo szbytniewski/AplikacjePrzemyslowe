@@ -11,6 +11,8 @@
 <div class="container">
   <h1>Add New Product</h1>
   <form action="/admin/add-product" method="post">
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+
     <label>Title:</label>
     <input type="text" name="title" required>
 

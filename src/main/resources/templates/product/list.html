@@ -17,7 +17,7 @@
 <div class="cart-summary">
     <h3>Shopping Cart</h3>
     <p>Total Products: <span th:text="${cart.items.size()}"></span></p>
-    <p>Total Price: <span th:text="'$' + ${cart.totalCost}"></span></p>
+    <p>Total Price: <span th:text="'$' + ${totalCost}"></span></p>
     <a href="/cart" class="button">View Cart</a>
 </div>
 <div class="container">
@@ -72,6 +72,7 @@
                 <a th:href="@{'/products/' + ${product.id}}" class="details-button">View Details</a>
                 <form th:action="@{'/cart/add/' + ${product.id}}" method="post">
                     <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="pricingOption" value="basic">
                     <button type="submit" class="add-to-cart-button">Add to Cart</button>
                 </form>
             </div>

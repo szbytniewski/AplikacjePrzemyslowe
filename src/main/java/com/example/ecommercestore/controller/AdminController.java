@@ -15,35 +15,30 @@ public class AdminController {
     @Autowired
     private EcommerceService ecommerceService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public String adminDashboard(Model model) {
         model.addAttribute("products", ecommerceService.getAllProducts());
         return "admin/dashboard";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/add-product")
     public String showAddProductForm(Model model) {
         model.addAttribute("product", new Product());
         return "admin/add-product";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add-product")
     public String addProduct(@ModelAttribute Product product) {
         ecommerceService.addProduct(product);
         return "redirect:/admin";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/delete-product/{id}")
     public String deleteProduct(@PathVariable Long id) {
         ecommerceService.deleteProduct(id);
         return "redirect:/admin";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/moderate-reviews/{id}")
     public String moderateReviews(@PathVariable Long id, Model model) {
         Product product = ecommerceService.getProductById(id).orElse(null);
@@ -52,7 +47,6 @@ public class AdminController {
         return "admin/moderate-reviews";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/delete-review/{productId}/{reviewIndex}")
     public String deleteReview(@PathVariable Long productId, @PathVariable int reviewIndex) {
         return "redirect:/admin/moderate-reviews/" + productId;
