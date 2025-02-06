@@ -2,22 +2,33 @@ package com.example.ecommercestore.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "customer_order")
+@Table(name = "orders")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String customerName;
-    private String customerEmail;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderProduct> orderProducts;
-    private double totalPrice;
+
+    @ManyToOne
+    private User user;
+
+    @OneToMany
+    private List<Product> products;
+
+    private Double totalAmount;
+
+    public Order(User user, List<Product> products, double totalAmount) {
+        this.user = user;
+        this.products = products;
+        this.totalAmount = totalAmount;
+    }
 }

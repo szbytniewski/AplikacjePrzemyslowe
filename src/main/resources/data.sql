@@ -1,2 +1,11 @@
-INSERT INTO product (id, title, image_url, description, extended_description, price, paczkomat_price, poczta_price, kurier_price, stock_quantity)
-VALUES (9, 'Sample Product', 'https://picsum.photos/100', 'Sample Description', 'Extended Sample Description', 19.99, 5.00, 7.00, 10.00, 100);
+-- Insert example product
+INSERT INTO products (title, image_url, price, price_with_shipping, short_description, detailed_description, stock_quantity)
+VALUES (
+           'Gaming Laptop',
+           'https://example.com/laptop.jpg',
+           1200.00,
+           1250.00,
+           'High-performance gaming laptop',
+           'This gaming laptop features a powerful processor, high-end graphics card, and fast SSD storage.',
+           10
+       );

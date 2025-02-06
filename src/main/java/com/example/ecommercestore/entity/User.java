@@ -4,23 +4,23 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Review {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private User user;
+    @Column(unique = true, nullable = false)
+    private String email;
 
-    @ManyToOne
-    private Product product;
+    private String name;
 
-    private Integer rating;
-    private String comment;
+    private String password;
+
+    private String role; // "USER", "ADMIN"
 }

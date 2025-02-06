@@ -1,64 +1,50 @@
 package com.example.ecommercestore.controller;
 
+import com.example.ecommercestore.entity.Cart;
 import com.example.ecommercestore.entity.Product;
-import com.example.ecommercestore.service.CartService;
-import com.example.ecommercestore.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.example.ecommercestore.entity.User;
+import com.example.ecommercestore.repository.CartRepository;
+import com.example.ecommercestore.repository.ProductRepository;
+import com.example.ecommercestore.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/cart")
+@RestController
+@RequestMapping("/api/cart")
 public class CartController {
 
-    @Autowired
-    private CartService cartService;
+    private final CartRepository cartRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private ProductService productService;
-
-    @GetMapping
-    public String viewCart(Model model) {
-        model.addAttribute("cart", cartService.getCart());
-        model.addAttribute("totalCost", cartService.getTotalCost());
-        return "cart/view";
+    public CartController(CartRepository cartRepository, UserRepository userRepository, ProductRepository productRepository) {
+        this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
-    @PostMapping("/add/{productId}")
-    public String addToCart(@PathVariable Long productId,
-                            @RequestParam int quantity,
-                            @RequestParam String pricingOption) {
-        Product product = productService.getProductById(productId);
-        double finalPrice = product.getPrice();
+    @PostMapping("/add")
+    public Cart addToCart(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
+        Long productId = request.get("productId");
 
-        switch (pricingOption) {
-            case "delivery1":
-                finalPrice += product.getPaczkomatPrice();
-                break;
-            case "delivery2":
-                finalPrice += product.getPocztaPrice();
-                break;
-            case "delivery3":
-                finalPrice += product.getKurierPrice();
-                break;
-            default:
-                break;
+        if (userId == null || productId == null) {
+            throw new IllegalArgumentException("Missing userId or productId");
         }
 
-        if (quantity < 1 || quantity > product.getStockQuantity()) {
-            throw new IllegalArgumentException("Invalid quantity selected");
-        }
+        User user = userRepository.findById(userId).orElseThrow();
+        Product product = productRepository.findById(productId).orElseThrow();
 
-        cartService.addToCart(product, quantity, finalPrice);
-        return "redirect:/cart";
+        Cart cart = cartRepository.findByUser(user).orElse(new Cart(user));
+        cart.getProducts().add(product);
+        return cartRepository.save(cart);
     }
 
-    @PostMapping("/remove/{productId}")
-    public String removeFromCart(@PathVariable Long productId) {
-        cartService.removeFromCart(productId);
-        return "redirect:/cart";
+    @GetMapping("/{userId}")
+    public Cart getCart(@PathVariable Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        return cartRepository.findByUser(user).orElse(new Cart(user));
     }
 }

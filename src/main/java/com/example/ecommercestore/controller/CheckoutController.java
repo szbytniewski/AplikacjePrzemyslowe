@@ -1,90 +1,64 @@
 package com.example.ecommercestore.controller;
 
-import com.example.ecommercestore.entity.*;
-import com.example.ecommercestore.service.CartService;
+import com.example.ecommercestore.entity.Cart;
+import com.example.ecommercestore.entity.Order;
+import com.example.ecommercestore.entity.Product;
+import com.example.ecommercestore.entity.User;
+import com.example.ecommercestore.repository.CartRepository;
 import com.example.ecommercestore.repository.OrderRepository;
-import com.example.ecommercestore.repository.OrderProductRepository;
-import com.example.ecommercestore.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.example.ecommercestore.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-@Controller
-@RequestMapping("/checkout")
+@RestController
+@RequestMapping("/api/checkout")
 public class CheckoutController {
 
-    @Autowired
-    private CartService cartService;
+    private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderProductRepository orderProductRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @GetMapping
-    public String checkoutForm(Model model) {
-        model.addAttribute("cart", cartService.getCart());
-        return "checkout/form";
+    public CheckoutController(OrderRepository orderRepository, CartRepository cartRepository, UserRepository userRepository) {
+        this.orderRepository = orderRepository;
+        this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
-    public String processCheckout(
-            @RequestParam String fullName,
-            @RequestParam String email,
-            @RequestParam String address,
-            @RequestParam String deliveryMethod,
-            Model model) {
+    public ResponseEntity<?> checkout(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
 
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            model.addAttribute("error", "Invalid email format");
-            model.addAttribute("cart", cartService.getCart());
-            return "checkout/form";
+        if (userId == null) {
+            return ResponseEntity.badRequest().body("Missing userId");
         }
 
-        // Create new order
-        Order order = new Order();
-        order.setCustomerName(fullName);
-        order.setCustomerEmail(email);
-        order.setTotalPrice(cartService.getTotalCost());
-
-        // Save order first to generate ID
-        order = orderRepository.save(order);
-
-        // Retrieve products from cart and save as OrderProduct
-        List<OrderProduct> orderProducts = new ArrayList<>();
-        for (CartItem cartItem : cartService.getCart().getItems()) {
-            OrderProduct orderProduct = new OrderProduct();
-            orderProduct.setOrder(order);
-            orderProduct.setProduct(cartItem.getProduct());
-            orderProduct.setQuantity(cartItem.getQuantity());
-            orderProducts.add(orderProduct);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found");
         }
 
-        // Save all OrderProduct entities
-        orderProductRepository.saveAll(orderProducts);
+        Optional<Cart> cartOptional = cartRepository.findByUser(userOptional.get());
+        if (cartOptional.isEmpty() || cartOptional.get().getProducts().isEmpty()) {
+            return ResponseEntity.badRequest().body("Cart is empty. Cannot checkout.");
+        }
 
-        // Update the order with saved products and save it again
-        order.setOrderProducts(orderProducts);
-        orderRepository.save(order);
+        User user = userRepository.findById(userId).orElseThrow();
+        Cart cart = cartRepository.findByUser(user).orElseThrow();
 
-        // Clear cart after order submission
-        cartService.clearCart();
+        List<Product> orderProducts = new ArrayList<>(cart.getProducts());
 
-        // Pass order details to the confirmation page
-        model.addAttribute("fullName", fullName);
-        model.addAttribute("email", email);
-        model.addAttribute("address", address);
-        model.addAttribute("deliveryMethod", deliveryMethod);
-        model.addAttribute("totalCost", order.getTotalPrice());
+        double totalAmount = orderProducts.stream().mapToDouble(Product::getPrice).sum();
+        Order order = new Order(user, orderProducts, totalAmount);
 
-        return "checkout/confirmation";
+        cart.getProducts().clear();
+        cartRepository.save(cart);
+
+
+        return ResponseEntity.ok(orderRepository.save(order));
     }
 }

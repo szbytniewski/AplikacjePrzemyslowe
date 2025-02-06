@@ -1,29 +1,31 @@
 package com.example.ecommercestore.entity;
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Entity
+@Table(name = "carts")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Cart {
-    private List<CartItem> items = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public void addItem(Product product, int quantity, double finalPrice) {
-        for (CartItem item : items) {
-            if (item.getProduct().getId().equals(product.getId()) && item.getFinalPrice() == finalPrice) {
-                item.setQuantity(item.getQuantity() + quantity);
-                return;
-            }
-        }
-        items.add(new CartItem(product, quantity, finalPrice));
-    }
+    @OneToOne
+    private User user;
 
-    public void removeItem(Long productId) {
-        items.removeIf(item -> item.getProduct().getId().equals(productId));
-    }
+    @OneToMany
+    private List<Product> products;
 
-    public void clearCart() {
-        items.clear();
+    public Cart(User user) {
+        this.user = user;
+        this.products = new ArrayList<>();
     }
 }
