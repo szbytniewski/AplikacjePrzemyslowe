@@ -21,6 +21,11 @@ public class ProductController {
         return productRepository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Product getProductById(@PathVariable Long id) {
+        return productRepository.findById(id).orElseThrow();
+    }
+
     @PostMapping
     public Product addProduct(@RequestBody Product product) {
         return productRepository.save(product);
