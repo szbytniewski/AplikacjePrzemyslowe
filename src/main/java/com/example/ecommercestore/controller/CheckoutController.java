@@ -1,47 +1,64 @@
 package com.example.ecommercestore.controller;
 
 import com.example.ecommercestore.entity.Cart;
-import com.example.ecommercestore.service.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.example.ecommercestore.entity.Order;
+import com.example.ecommercestore.entity.Product;
+import com.example.ecommercestore.entity.User;
+import com.example.ecommercestore.repository.CartRepository;
+import com.example.ecommercestore.repository.OrderRepository;
+import com.example.ecommercestore.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/checkout")
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/checkout")
 public class CheckoutController {
 
-    @Autowired
-    private CartService cartService;
+    private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
+    private final UserRepository userRepository;
 
-    @GetMapping
-    public String checkoutForm(Model model) {
-        model.addAttribute("cart", cartService.getCart());
-        return "checkout/form";
+    public CheckoutController(OrderRepository orderRepository, CartRepository cartRepository, UserRepository userRepository) {
+        this.orderRepository = orderRepository;
+        this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
-    public String processCheckout(
-            @RequestParam String fullName,
-            @RequestParam String email,
-            @RequestParam String address,
-            @RequestParam String deliveryMethod,
-            Model model) {
+    public ResponseEntity<?> checkout(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
 
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            model.addAttribute("error", "Invalid email format");
-            model.addAttribute("cart", cartService.getCart());
-            return "checkout/form";
+        if (userId == null) {
+            return ResponseEntity.badRequest().body("Missing userId");
         }
 
-        model.addAttribute("fullName", fullName);
-        model.addAttribute("email", email);
-        model.addAttribute("address", address);
-        model.addAttribute("deliveryMethod", deliveryMethod);
-        model.addAttribute("totalCost", cartService.getTotalCost());
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
 
-        cartService.clearCart();
+        Optional<Cart> cartOptional = cartRepository.findByUser(userOptional.get());
+        if (cartOptional.isEmpty() || cartOptional.get().getProducts().isEmpty()) {
+            return ResponseEntity.badRequest().body("Cart is empty. Cannot checkout.");
+        }
 
-        return "checkout/confirmation";
+        User user = userRepository.findById(userId).orElseThrow();
+        Cart cart = cartRepository.findByUser(user).orElseThrow();
+
+        List<Product> orderProducts = new ArrayList<>(cart.getProducts());
+
+        double totalAmount = orderProducts.stream().mapToDouble(Product::getPrice).sum();
+        Order order = new Order(user, orderProducts, totalAmount);
+
+        cart.getProducts().clear();
+        cartRepository.save(cart);
+        orderRepository.save(order);
+
+        return ResponseEntity.ok("Your order has been saved!");
     }
 }

@@ -1,54 +1,47 @@
 package com.example.ecommercestore.controller;
 
 import com.example.ecommercestore.entity.Product;
-import com.example.ecommercestore.service.ProductServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.example.ecommercestore.repository.ProductRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/admin")
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/admin")
 public class AdminController {
 
-    @Autowired
-    private ProductServiceInterface productService;
+    private final ProductRepository productRepository;
 
-    @GetMapping
-    public String adminDashboard(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
-        return "admin/dashboard";
+    public AdminController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
-    @GetMapping("/add-product")
-    public String showAddProductForm(Model model) {
-        model.addAttribute("product", new Product());
-        return "admin/add-product";
+    @PostMapping("/products")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Product addProduct(@Valid @RequestBody Product product) {
+        return productRepository.save(product);
     }
 
-    @PostMapping("/add-product")
-    public String addProduct(@ModelAttribute Product product) {
-        productService.saveProduct(product);
-        return "redirect:/admin";
+    @PutMapping("/products/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Product updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
+        Optional<Product> existingProduct = productRepository.findById(id);
+        if (existingProduct.isEmpty()) {
+            throw new RuntimeException("Product not found");
+        }
+        product.setId(id);
+        return productRepository.save(product);
     }
 
-    @PostMapping("/delete-product/{id}")
-    public String deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return "redirect:/admin";
-    }
+    @DeleteMapping("/products/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteProduct(@PathVariable Long id) {
 
-    @GetMapping("/moderate-reviews/{id}")
-    public String moderateReviews(@PathVariable Long id, Model model) {
-        Product product = productService.getProductById(id);
-        model.addAttribute("product", product);
-        model.addAttribute("reviews", product.getReviews());
-        return "admin/moderate-reviews";
-    }
-
-    @PostMapping("/delete-review/{productId}/{reviewIndex}")
-    public String deleteReview(@PathVariable Long productId, @PathVariable int reviewIndex) {
-        productService.removeReview(productId, reviewIndex);
-        return "redirect:/admin/moderate-reviews/" + productId;
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found");
+        }
+        productRepository.deleteById(id);
     }
 }

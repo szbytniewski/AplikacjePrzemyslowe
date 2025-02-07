@@ -1,31 +1,34 @@
 package com.example.ecommercestore.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "carts")
+@Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Cart {
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private User user;
 
     @OneToMany
     private List<Product> products;
 
-    public Cart(User user) {
+    private Double totalAmount;
+
+    public Order(User user, List<Product> products, double totalAmount) {
         this.user = user;
-        this.products = new ArrayList<>();
+        this.products = products;
+        this.totalAmount = totalAmount;
     }
 }
