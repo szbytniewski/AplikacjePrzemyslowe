@@ -6,6 +6,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -25,6 +27,10 @@ public class AdminController {
     @PutMapping("/products/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public Product updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
+        Optional<Product> existingProduct = productRepository.findById(id);
+        if (existingProduct.isEmpty()) {
+            throw new RuntimeException("Product not found");
+        }
         product.setId(id);
         return productRepository.save(product);
     }
@@ -32,6 +38,10 @@ public class AdminController {
     @DeleteMapping("/products/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable Long id) {
+
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Product not found");
+        }
         productRepository.deleteById(id);
     }
 }

@@ -26,11 +26,6 @@ public class ProductController {
         return productRepository.findById(id).orElseThrow();
     }
 
-    @PostMapping
-    public Product addProduct(@RequestBody Product product) {
-        return productRepository.save(product);
-    }
-
     @GetMapping("/search")
     public List<Product> searchProducts(@RequestParam String keyword) {
         return productRepository.searchByTitle(keyword);

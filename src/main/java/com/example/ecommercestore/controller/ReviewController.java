@@ -7,6 +7,7 @@ import com.example.ecommercestore.repository.ProductRepository;
 import com.example.ecommercestore.repository.ReviewRepository;
 import com.example.ecommercestore.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class ReviewController {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
     }
-
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public ResponseEntity<?> addReview(@RequestBody Map<String, Object> request) {
         Long userId = ((Number) request.get("userId")).longValue();

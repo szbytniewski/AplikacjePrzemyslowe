@@ -57,8 +57,8 @@ public class CheckoutController {
 
         cart.getProducts().clear();
         cartRepository.save(cart);
+        orderRepository.save(order);
 
-
-        return ResponseEntity.ok(orderRepository.save(order));
+        return ResponseEntity.ok("Your order has been saved!");
     }
 }

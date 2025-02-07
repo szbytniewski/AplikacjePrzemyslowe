@@ -6,7 +6,11 @@ import com.example.ecommercestore.entity.User;
 import com.example.ecommercestore.repository.CartRepository;
 import com.example.ecommercestore.repository.ProductRepository;
 import com.example.ecommercestore.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+
 
 import java.util.List;
 import java.util.Map;
@@ -25,26 +29,58 @@ public class CartController {
         this.productRepository = productRepository;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/add")
-    public Cart addToCart(@RequestBody Map<String, Long> request) {
-        Long userId = request.get("userId");
+    public Cart addToCart(@RequestBody Map<String, Long> request, Authentication authentication) {
         Long productId = request.get("productId");
 
-        if (userId == null || productId == null) {
-            throw new IllegalArgumentException("Missing userId or productId");
+        if (productId == null) {
+            throw new IllegalArgumentException("Missing productId");
         }
 
-        User user = userRepository.findById(userId).orElseThrow();
-        Product product = productRepository.findById(productId).orElseThrow();
+        // Get the authenticated user's details
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        // Find the user's cart or create a new one
         Cart cart = cartRepository.findByUser(user).orElse(new Cart(user));
         cart.getProducts().add(product);
+
         return cartRepository.save(cart);
     }
 
-    @GetMapping("/{userId}")
-    public Cart getCart(@PathVariable Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+    @PostMapping("/remove")
+    public Cart removeFromCart(@RequestBody Map<String, Long> request, Authentication authentication) {
+        Long productId = request.get("productId");
+        if (productId == null) {
+            throw new IllegalArgumentException("Missing productId");
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        cart.getProducts().remove(product);
+        return cartRepository.save(cart);
+    }
+
+
+    @GetMapping
+    public Cart getCart(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         return cartRepository.findByUser(user).orElse(new Cart(user));
     }
 }
