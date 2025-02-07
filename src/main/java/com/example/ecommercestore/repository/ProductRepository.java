@@ -9,7 +9,11 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.title LIKE %:keyword%")
-    List<Product> searchProducts(@Param("keyword") String keyword);
+    List<Product> searchByTitle(@Param("keyword") String keyword);
 
-    List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
+    @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice")
+    List<Product> findByPriceRange(@Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice);
+
+    @Query("SELECT p FROM Product p WHERE p.stockQuantity > 0")
+    List<Product> findAvailableProducts();
 }

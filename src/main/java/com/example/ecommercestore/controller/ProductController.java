@@ -30,4 +30,19 @@ public class ProductController {
     public Product addProduct(@RequestBody Product product) {
         return productRepository.save(product);
     }
+
+    @GetMapping("/search")
+    public List<Product> searchProducts(@RequestParam String keyword) {
+        return productRepository.searchByTitle(keyword);
+    }
+
+    @GetMapping("/price-range")
+    public List<Product> getProductsByPriceRange(@RequestParam Double minPrice, @RequestParam Double maxPrice) {
+        return productRepository.findByPriceRange(minPrice, maxPrice);
+    }
+
+    @GetMapping("/available")
+    public List<Product> getAvailableProducts() {
+        return productRepository.findAvailableProducts();
+    }
 }

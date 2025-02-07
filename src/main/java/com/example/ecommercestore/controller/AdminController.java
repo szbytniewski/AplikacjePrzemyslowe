@@ -3,6 +3,7 @@ package com.example.ecommercestore.controller;
 import com.example.ecommercestore.entity.Product;
 import com.example.ecommercestore.repository.ProductRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,13 +18,13 @@ public class AdminController {
 
     @PostMapping("/products")
     @PreAuthorize("hasRole('ADMIN')")
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(@Valid @RequestBody Product product) {
         return productRepository.save(product);
     }
 
     @PutMapping("/products/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+    public Product updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
         product.setId(id);
         return productRepository.save(product);
     }
